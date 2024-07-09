@@ -2,12 +2,13 @@ from tkinter import *
 from tkinter import messagebox, Menu, ttk, Canvas
 from os import path
 import datetime
-# from models.leds import VentanaLeds
-# from models.arduinoi import VentanaArduino
+from models.leds import VentanaLeds
+from models.motor import VentanaMotor
 import serial
 import serial.tools.list_ports
-from libs.pydb import Pydb
+from libs.pydb import PytuinoDB
 from models.admin.adminLogin import loginadmin
+from models.admin.admin import Admin
 
 
 class menuPrincipal(Tk):
@@ -33,8 +34,8 @@ class menuPrincipal(Tk):
         self.ledimg = PhotoImage(file="img/ledmenu.png")
         self.ledmotor = PhotoImage(file="img/motormenu.png")
         self.opcionesMenu = Menu(self.barraMenu, tearoff=False)
-        self.opcionesMenu.add_command(label="Manejo Leds",image=self.ledimg,compound=LEFT)
-        self.opcionesMenu.add_command(label="Manejo Motor",image=self.ledmotor,compound=LEFT)
+        self.opcionesMenu.add_command(label="Manejo Leds",image=self.ledimg,compound=LEFT, command=self.leds)
+        self.opcionesMenu.add_command(label="Manejo Motor",image=self.ledmotor,compound=LEFT, command=self.motor)
         self.barraMenu.add_cascade(label="Opciones", menu=self.opcionesMenu)
         self.barraMenu.add_command(label="Reiniciar", command=self.reiniciara)
         
@@ -89,25 +90,21 @@ class menuPrincipal(Tk):
     def ayudaarduino(self):
         messagebox.showinfo(title="Pytuino Ayuda Arduino",message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
         
-    # def leds(self):
-    #     archivo = open("logs/" + self.datosuser[1] + ".txt", "a+")
-    #     archivo.write('\n['+self.obtenerfecha()+'] El usuario ha ingresado a manejo leds')
-    #     led=VentanaLeds(self,self.puertoarduino, self.datosuser[1])
-    #     led.grab_set()
-    #     led.wait_window()
-    #     print("ledowo")
-    #     archivo.write('\n['+self.obtenerfecha()+'] El usuario ha salido de manejo leds')
-    #     archivo.close()
-
-    # def arduino(self):
-    #     led=VentanaArduino(self)
-    #     led.grab_set()
-    #     led.wait_window()
-    #     print(self.puertoarduino)  
-    # def motor(self):
-    #     motor=VentanaMotor(self)
-    #     motor.grab_set()
-    #     motor.wait_window()
+    def leds(self):
+         archivo = open("cache/logs/" + self.datosuser[1] + ".txt", "a+")
+         archivo.write('\n['+self.obtenerfecha()+'] El usuario ha ingresado a manejo leds')
+         led=VentanaLeds()
+         led.grab_set()
+         led.wait_window()
+         print("ledowo")
+         archivo.write('\n['+self.obtenerfecha()+'] El usuario ha salido de manejo leds')
+         archivo.close()
+ 
+    def motor(self):
+        motor=VentanaMotor()
+        motor.grab_set()
+        motor.wait_window()
+        motor.destroy()
     
     def obtenerfecha(self):
         fecha = datetime.datetime.now()
@@ -116,7 +113,7 @@ class menuPrincipal(Tk):
     
     def reiniciara(self):
         self.destroy()
-        self.__init__()
+        self.__init__(self.datosuser)
     
     def GetPuertos(self, value):
         # Obtener una lista de todos los puertos disponibles
@@ -141,15 +138,18 @@ class menuPrincipal(Tk):
         self.adminpass = None
         admin = loginadmin(self)
         admin.wait_window()
-        db = Pydb()
+        db = PytuinoDB()
         if db.comprobarPass(self.datosuser[1],self.adminpass):
             self.opcionesAdmin = Menu(self.barraMenu, tearoff=False)
-            self.opcionesAdmin.add_command(label="Administracion de modulos",image=self.ledimg,compound=LEFT)
-            self.opcionesAdmin.add_command(label="Cambiar Contraseña",image=self.ledmotor,compound=LEFT)
-            self.opcionesAdmin.add_command(label="Salir del modo Administrador",image=self.ledmotor,compound=LEFT)
+            self.opcionesAdmin.add_command(label="Administracion de modulos",image=self.ledimg,compound=LEFT,command=self.adminleds)
+            # self.opcionesAdmin.add_command(label="Cambiar Contraseña",image=self.ledmotor,compound=LEFT)
+            # self.opcionesAdmin.add_command(label="Salir del modo Administrador",image=self.ledmotor,compound=LEFT)
             self.barraMenu.add_cascade(label="Administrador", menu=self.opcionesAdmin)
         else:
             messagebox.showerror("PytuinoError","La contraseña es incorrecta :)")
-
+    def adminleds(self):
+        al = Admin()
+        al.grab_set()
+        al.wait_window()
 # app = menuPrincipal((1, 'Albert', '30506910', 1, 'Administrador'))
 # app.mainloop()

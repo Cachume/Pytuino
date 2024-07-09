@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import messagebox
 from models.register import VentanaRegistro
-from libs.pydb import Pydb
+from libs.pydb import PytuinoDB
 from models.admin.admin import Admin
 from models.menup import menuPrincipal
 from models.leds import VentanaLeds
+
 
 class myApp(Tk):
 
@@ -41,7 +42,7 @@ class myApp(Tk):
     def iniciar_sesion(self):
         users=self.user.get()
         passw=self.passwo.get()
-        query = Pydb().loginUser(users,passw)
+        query = PytuinoDB().loginUser(users,passw)
         if query:
             messagebox.showinfo(title='Verificacion exitosa',message="Has iniciado sesion correctamente.")  
             rol = query[3]

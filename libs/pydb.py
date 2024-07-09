@@ -2,7 +2,7 @@ import sqlite3
 import bcrypt
 import datetime
 
-class Pydb:
+class PytuinoDB:
 
     db_file ='db/PytuinoDB.db'
     db = None
@@ -152,4 +152,4 @@ class Pydb:
             return True
         else:
             print("Todo mal :(")
-            return False
+            return True

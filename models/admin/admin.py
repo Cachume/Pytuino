@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import messagebox, Menu, ttk
-from libs.pydb import Pydb
+from libs.pydb import PytuinoDB
 from PIL import Image, ImageTk, ImageSequence
 
-class Admin(Tk):
+class Admin(Toplevel):
 
     def __init__(self):
         super().__init__()   
@@ -72,7 +72,7 @@ class Admin(Tk):
             messagebox.showerror("Error", "Selección no válida.")
             return False
         combinacion=funcion+"/"+valores
-        dbp=Pydb()
+        dbp=PytuinoDB()
         if dbp.insertLeds(combinacion):
             messagebox.showinfo("Pytuino | Administrador","Se ha añadido exitosamente la nueva instruccion")
         else:

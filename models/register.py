@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-from libs.pydb import Pydb
+from libs.pydb import PytuinoDB
 class VentanaRegistro(Tk):
     def __init__(self):
         super().__init__()    
@@ -46,7 +46,7 @@ class VentanaRegistro(Tk):
         correo = self.email.get()
         contrasena = self.passwor.get()
         confirmacion_contrasena = self.passwod.get()
-        conedb = Pydb()
+        conedb = PytuinoDB()
         if nombres == '' or usuario == '' or correo == '' or contrasena == '' or confirmacion_contrasena == '':
             messagebox.showerror("Error", "Todos los campos son obligatorios. Por favor, completa todos los campos.")
         else:

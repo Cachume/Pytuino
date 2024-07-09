@@ -5,9 +5,9 @@ import datetime
 import serial
 import time
 from config.Ic import *
-from libs.pydb import Pydb
+from libs.pydb import PytuinoDB
 
-class VentanaLeds(Tk):
+class VentanaLeds(Toplevel):
     estadoarduino= False
     estado = False
     should_continue = True
@@ -48,19 +48,30 @@ class VentanaLeds(Tk):
             self.botona.config(text="Conectar", bg="green")
             self.ea.config(text="Desconectado", fg="red")
             self.estadoarduino = False
+            self.ser.close()
         else:
-            self.botona.config(text="Desconectar", bg="red")
-            self.ea.config(text="Conectado", fg="green")
-            self.estadoarduino = True
+            try:
+                self.ser = serial.Serial("COM3", 9600, timeout=1)
+                time.sleep(2)
+                self.botona.config(text="Desconectar", bg="red")
+                self.ea.config(text="Conectado", fg="green")
+                self.estadoarduino = True
+            except:
+                messagebox.showerror("Pytuino", "Error al conectar el arduino")
 
     def startleds(self):
         if not self.estado:
             funcion = self.Funciones.get().split("/")
             if funcion[0] == "Encender Todos":
-                self.imagen=PhotoImage(file="img/et/"+funcion[1]+".png")
+                try:
+                    self.imagen=PhotoImage(file="img/et/"+funcion[1]+".png")
+                except:
+                    self.imagen=PhotoImage(file="img/et/0000.png")
                 self.ledimage.config(image=self.imagen)
+                self.MessageforArduino("Leds/et/"+funcion[1])
             elif funcion[0] == "Parpadeo":
-                gif = Image.open("img/p/"+funcion[1]+".gif")
+                gif = Image.open("img/pd/"+funcion[1]+".gif")
+                self.MessageforArduino("Leds/p/"+funcion[1])
                 frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
                 current_frame = 0
                 self.should_continue = True
@@ -77,9 +88,10 @@ class VentanaLeds(Tk):
             self.botona['state']='normal'
             self.Funciones['state']='normal'
             self.accionb.config(text="Comenzar",fg='green')
+            self.MessageforArduino("Leds/et/0000")
 
     def mostrarLeds(self):
-        db = Pydb()
+        db = PytuinoDB()
         db.obtenerLeds()
         acciones = {
         "pd": "Parpadeo",
@@ -102,4 +114,8 @@ class VentanaLeds(Tk):
         fecha = datetime.datetime.now()
         actual = str(fecha.year)+"/"+str(fecha.month)+'/'+str(fecha.day)+' '+str(fecha.hour)+':'+str(fecha.second)
         return actual
+    
+    def MessageforArduino(self, comando):
+        if self.estadoarduino:
+            self.ser.write(comando.encode())
         
