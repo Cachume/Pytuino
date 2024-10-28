@@ -5,10 +5,13 @@ import datetime
 from PIL import Image, ImageTk
 import serial
 import serial.tools.list_ports
+from posicionamiento import Posicionamiento
+from funcmanual import KeyApp
 
 class menuPrincipal(Tk):
     puertoarduino = ""
     datosuser = ""
+    modoposicionamiento = None
     
     def __init__(self, usuario):
         super().__init__()
@@ -20,17 +23,6 @@ class menuPrincipal(Tk):
         self.config(bg="#ffffff")
         icono = PhotoImage(file="img/logos/logoapp.png")
         self.iconphoto(True, icono)
-
-        # Declaración del menú
-        self.barraMenu = Menu(self)
-        self.config(menu=self.barraMenu)
-        self.ledimg = PhotoImage(file="img/ledmenu.png")
-        self.ledmotor = PhotoImage(file="img/motormenu.png")
-        self.opcionesMenu = Menu(self.barraMenu, tearoff=False)
-        self.opcionesMenu.add_command(label="Manejo Leds", image=self.ledimg, compound=LEFT)
-        self.opcionesMenu.add_command(label="Manejo Motor", image=self.ledmotor, compound=LEFT)
-        self.barraMenu.add_cascade(label="Opciones", menu=self.opcionesMenu)
-        self.barraMenu.add_command(label="Reiniciar")
 
         # Sección de Bienvenida
         Label(self, text="Te has conectado como:", font=("Arial", 11, 'bold')).place(x=10, y=10)
@@ -53,18 +45,17 @@ class menuPrincipal(Tk):
         self.velocidad.place(x=40, y=70)
 
         # Sección de Posicionamiento Automático
-        posiciona_frame = Frame(self, background="#F7DC6F", width=340, height=160)
-        posiciona_frame.place(x=235, y=120)
-        Label(posiciona_frame, text="Posicionamiento Automático", font=("Arial", 11, 'bold'), bg="#F7DC6F").place(x=65, y=20)
-        Button(posiciona_frame, text="Posición 1", command=lambda: self.mover_grua("pos1")).place(x=40, y=80)
-        Button(posiciona_frame, text="Posición 2", command=lambda: self.mover_grua("pos2")).place(x=140, y=80)
-        Button(posiciona_frame, text="Posición 3", command=lambda: self.mover_grua("pos3")).place(x=230, y=80)
+        self.posiciona_frame = Frame(self, background="#F7DC6F", width=340, height=160)
+        self.posiciona_frame.place(x=235, y=120)
+        Label(self.posiciona_frame, text="Posicionamiento", font=("Arial", 11, 'bold'), bg="#F7DC6F").place(x=100, y=20)
+        self.posiboton = Button(self.posiciona_frame, text="Gestionar Posicionamiento", command=lambda: self.mover_grua("pos2"),bg="#B9770E",fg="#ffffff",font=("Open Sans", 9, "bold"))
+        self.posiboton.place(x=80, y=80)
 
         # Botón de Emergencia (Modo de Seguridad)
         self.boton_emergencia = Button(self, text="EMERGENCIA", bg="red", fg="white", font=("Arial", 12, 'bold'), command=self.emergencia)
         self.boton_emergencia.place(x=650, y=450)
 
-        self.boton_inicio = Button(self, text="Iniciar Trabajo", bg="#0ED611", fg="white", font=("Arial", 12, 'bold'))
+        self.boton_inicio = Button(self, text="Iniciar Trabajo", bg="#0ED611", fg="white", font=("Arial", 12, 'bold'),command=self.iniciar)
         self.boton_inicio.place(x=500, y=450)
 
         # Sección de Feedback Visual#
@@ -100,7 +91,13 @@ class menuPrincipal(Tk):
         self.velocidad_actual.config(text="Velocidad: " + str(self.velocidad.get()))
 
     def mover_grua(self, posicion):
-        # Cambiar el estado visualmente y realizar la acción de movimiento
+        rendi = Posicionamiento(self)
+        rendi.grab_set()
+        rendi.wait_window()
+        print(self.modoposicionamiento)
+        if self.modoposicionamiento == "Manual":
+            self.posiboton.place(x=80, y=90)
+            Label(self.posiciona_frame, text="Modo Manual Seleccionado",font=("Open Sans", 12, "bold"),bg="#F7DC6F").place(x=60, y=50)
         self.estado_grua.config(text="Estado: Moviendo")
         self.posicion_actual.config(text="Posición: " + posicion)
         # Aquí podrías añadir el código de movimiento real a la posición dada
@@ -111,8 +108,12 @@ class menuPrincipal(Tk):
         self.estado_grua.config(text="Estado: Emergencia activada")
         # Aquí puedes añadir el código para detener la grúa en caso de emergencia
 
-    def ayudaarduino(self):
+    def iniciar(self):
         messagebox.showinfo(title="Pytuino Ayuda Arduino", message="Aquí va la ayuda sobre el uso de Arduino.")
+        if self.modoposicionamiento == "Manual":
+            manual = KeyApp()
+            manual.grab_set()
+            manual.wait_window()
 
     def GetPuertos(self, value):
         puertos = [port.device for port in serial.tools.list_ports.comports()]
