@@ -36,3 +36,37 @@
 [2024/7/9 6:14] El usuario ha iniciado sesion
 [2024/7/9 6:16] El usuario ha ingresado a manejo leds
 [2024/7/9 6:18] El usuario ha salido de manejo leds
+
+
+[2018/9/15 3:34] El usuario ha iniciado sesion
+[2018/9/15 3:3] El usuario ha ingresado a manejo leds
+[2018/9/15 3:32] El usuario ha salido de manejo leds
+
+
+[2018/9/15 3:38] El usuario ha iniciado sesion
+[2018/9/15 3:42] El usuario ha ingresado a manejo leds
+[2018/9/15 3:49] El usuario ha salido de manejo leds
+
+
+[2018/9/15 3:55] El usuario ha iniciado sesion
+[2018/9/15 3:47] El usuario ha ingresado a manejo leds
+[2018/9/15 3:20] El usuario ha salido de manejo leds
+
+
+[2018/9/15 4:20] El usuario ha iniciado sesion
+[2018/9/15 4:30] El usuario ha ingresado a manejo leds
+[2018/9/15 4:27] El usuario ha salido de manejo leds
+
+
+[2018/9/15 4:0] El usuario ha iniciado sesion
+
+
+[2018/9/15 5:56] El usuario ha iniciado sesion
+
+
+[2018/9/15 5:32] El usuario ha iniciado sesion
+[2018/9/15 5:58] El usuario ha ingresado a manejo leds
+[2018/9/15 5:50] El usuario ha salido de manejo leds
+
+
+[2024/10/15 8:3] El usuario ha iniciado sesion

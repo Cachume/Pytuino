@@ -56,6 +56,7 @@ class VentanaMotor(Toplevel):
                 self.arduino = True
                 for wi in [self.vela,self.velm,self.velal]:
                     wi.config(state="normal")
+                self.add_button.config(text="Desconectar Motor")
                 self.grafica = not self.grafica
                 if self.grafica:
                     self.update_graph()
@@ -64,7 +65,9 @@ class VentanaMotor(Toplevel):
         else:
             self.grafica = not self.grafica
             self.arduino = False
+            self.MessageforArduino("Motor/0/3")
             self.ser.close()
+            self.add_button.config(text="Conectar Motor")
             for wi in [self.vela,self.velm,self.velal]:
                     wi.config(state="disable")
             if self.grafica:
