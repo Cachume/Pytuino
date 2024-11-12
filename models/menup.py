@@ -5,13 +5,14 @@ import datetime
 from PIL import Image, ImageTk
 import serial
 import serial.tools.list_ports
-from posicionamiento import Posicionamiento
 from funcmanual import KeyApp
 
 class menuPrincipal(Tk):
     puertoarduino = ""
     datosuser = ""
     modoposicionamiento = None
+    tipotransporte = None
+    arduino = None
     
     def __init__(self, usuario):
         super().__init__()
@@ -19,7 +20,7 @@ class menuPrincipal(Tk):
         self.GetPuertos(0)
         self.title("Menu Principal | Pyduino")
         self.geometry("800x500")
-        self.resizable(0,0)
+        self.resizable(0,0) 
         self.config(bg="#ffffff")
         icono = PhotoImage(file="img/logos/logoapp.png")
         self.iconphoto(True, icono)
@@ -84,13 +85,14 @@ class menuPrincipal(Tk):
         self.seleccionar_puerto = ttk.Combobox(arduino_frame, width=20, textvariable=valor, state="readonly")
         self.seleccionar_puerto['values'] = self.puertospermitidos
         self.seleccionar_puerto.place(x=25, y=100, width=150)
-        self.boton_arduino = Button(arduino_frame, text="Conectar",bg="#0ED611",fg="#ffffff",font=("Open Sans", 10, "bold"))
+        self.boton_arduino = Button(arduino_frame, text="Conectar",bg="#0ED611",fg="#ffffff",font=("Open Sans", 10, "bold"),command=lambda: self.connectArduino(self.seleccionar_puerto.get()))
         self.boton_arduino.place(x=65,y=140)
 
     def actualizar_velocidad(self, event):
         self.velocidad_actual.config(text="Velocidad: " + str(self.velocidad.get()))
 
     def mover_grua(self, posicion):
+        from posicionamiento import Posicionamiento
         rendi = Posicionamiento(self)
         rendi.grab_set()
         rendi.wait_window()
@@ -98,22 +100,34 @@ class menuPrincipal(Tk):
         if self.modoposicionamiento == "Manual":
             self.posiboton.place(x=80, y=90)
             Label(self.posiciona_frame, text="Modo Manual Seleccionado",font=("Open Sans", 12, "bold"),bg="#F7DC6F").place(x=60, y=50)
+        elif self.modoposicionamiento == "Automatico":
+            Label(self.posiciona_frame, text="Modo Automatico Seleccionado",font=("Open Sans", 12, "bold"),bg="#F7DC6F").place(x=40, y=50)
+            Label(self.posiciona_frame, text="Objeto de transporte: "+ self.tipotransporte,font=("Open Sans", 12, "bold"),bg="#F7DC6F").place(x=30, y=74)
+            self.posiboton.place(x=80, y=110)
         self.estado_grua.config(text="Estado: Moviendo")
         self.posicion_actual.config(text="Posición: " + posicion)
-        # Aquí podrías añadir el código de movimiento real a la posición dada
-        # Una vez que finalice el movimiento, podrías actualizar el estado nuevamente
         self.after(1000, lambda: self.estado_grua.config(text="Estado: Inactivo"))
 
     def emergencia(self):
         self.estado_grua.config(text="Estado: Emergencia activada")
-        # Aquí puedes añadir el código para detener la grúa en caso de emergencia
 
     def iniciar(self):
-        messagebox.showinfo(title="Pytuino Ayuda Arduino", message="Aquí va la ayuda sobre el uso de Arduino.")
-        if self.modoposicionamiento == "Manual":
-            manual = KeyApp()
-            manual.grab_set()
-            manual.wait_window()
+        if self.arduino == None:
+            messagebox.showerror("PytuinoArm","No has conectado el arduino por favor, selecciona su puerto")
+        else:
+            if self.modoposicionamiento == "Manual":
+                manual = KeyApp()
+                manual.grab_set()
+                manual.wait_window()
+            elif self.modoposicionamiento == "Automatico":
+                print("asd")
+
+    def connectArduino(self,puerto):
+        try:
+            self.arduino = serial.Serial(puerto,9600,timeout=2)
+            messagebox.showinfo("PytuinoArm","Arduino conectado con exito")
+        except:
+            messagebox.showerror("PytuinoArm","Error al conectar con arduino, intenta otro puerto")
 
     def GetPuertos(self, value):
         puertos = [port.device for port in serial.tools.list_ports.comports()]
