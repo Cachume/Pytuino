@@ -13,23 +13,23 @@ class menuPrincipal(Tk):
     modoposicionamiento = None
     tipotransporte = None
     arduino = None
-    
+
     def __init__(self, usuario):
         super().__init__()
         self.datosuser = usuario
         self.GetPuertos(0)
         self.title("Menu Principal | Pyduino")
         self.geometry("800x500")
-        self.resizable(0,0) 
+        self.resizable(0,0)
         self.config(bg="#ffffff")
         icono = PhotoImage(file="img/logos/logoapp.png")
         self.iconphoto(True, icono)
 
-        # Sección de Bienvenida
-        Label(self, text="Te has conectado como:", font=("Arial", 11, 'bold')).place(x=10, y=10)
-        Label(self, text="Usuario: " + self.datosuser[1], font=("Arial", 10, 'bold')).place(x=10, y=40)
-        Label(self, text="Tipo de acceso: " + str(self.datosuser[3]), font=("Arial", 10, 'bold')).place(x=10, y=70)
-        Label(self, text="Última Conexión: " + self.datosuser[4], font=("Arial", 10, 'bold')).place(x=10, y=100)
+        # Sección de Bienvenida # Label(self, text="Te has conectado como:", font=("Arial", 11, 'bold')).place(x=10, y=10)
+        # Label(self, text="Usuario: " + self.datosuser[1], font=("Arial", 10, 'bold')).place(x=10, y=40)
+        # Label(self, text="Tipo de acceso: " + str(self.datosuser[3]), font=("Arial", 10, 'bold')).place(x=10, y=70)
+        # Label(self, text="Última Conexión: " + self.datosuser[4], font=("Arial", 10, 'bold')).place(x=10, y=100)
+       
 
         # Imagen del logo
         imagen_original = Image.open("img/pytuino_logo.png")
@@ -92,7 +92,7 @@ class menuPrincipal(Tk):
         self.velocidad_actual.config(text="Velocidad: " + str(self.velocidad.get()))
 
     def mover_grua(self, posicion):
-        from posicionamiento import Posicionamiento
+        from models.posicionamiento import Posicionamiento
         rendi = Posicionamiento(self)
         rendi.grab_set()
         rendi.wait_window()

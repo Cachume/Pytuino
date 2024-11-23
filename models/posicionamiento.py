@@ -65,14 +65,15 @@ class Posicionamiento(Toplevel):
         boton_volver.place(x=260,y=260)
 
     def seleccionar_modo(self, modo):
-        messagebox.showinfo("Modo Seleccionado", f"Modo {modo} seleccionado")
-        self.principal.modoposicionamiento = modo
-
+        #messagebox.showinfo("Modo Seleccionado", f"Modo {modo} seleccionado")
         if modo == "Automatico":
             self.mostrar_objetos()
+        elif modo == "Manual":
+            self.principal.datosposicionamiento=[modo,"N/A"]
+            self.destroy()
 
     def seleccionar_material(self, material):
-        self.principal.tipotransporte = material
+        self.principal.datosposicionamiento=["Automatico",material]
         print(material)
         self.destroy()
 
