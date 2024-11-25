@@ -13,8 +13,7 @@ class MenuPrincipal(CTk):
         self.title("Menu Principal | Pyduino")
         self.geometry("800x500")
         self.resizable(0,0)
-        #self.GetPuertos()
-        self.arduinoconex=[False]
+        self.GetPuertos()
         self.boton = CTkButton(self, text="Iniciar Trabajo", fg_color="#0ED611", font=("Arial", 12, 'bold'),command=lambda: self.initWork())
         self.boton.place(x=640, y=450)
 
@@ -102,16 +101,20 @@ class MenuPrincipal(CTk):
         self.puertospermitidos = []
         for puerto in puertos:
             try:
-                with serial.Serial(puerto, 9600, timeout=2) as ser:
-                    print(puerto)
-                    instruccion="ConexionPython/0"
-                    time.sleep(2)
-                    ser.write(instruccion.encode())
-                    response = ser.readline().decode('utf-8').strip()
-                    print(response)
-                    if response == "PytuinoArmConexion":
-                        #messagebox.showinfo("PytuinoArm","Conexion creada con exito")
-                        self.arduinoconex=[True,ser]
+                ser = serial.Serial(puerto, 9600, timeout=2)
+                print(puerto)
+                instruccion = "ConexionPython/0"
+                time.sleep(2)
+                ser.write(instruccion.encode())
+                response = ser.readline().decode('utf-8').strip()
+                print(response)
+                if response == "PytuinoArmConexion":
+                    messagebox.showinfo("PytuinoArm", "Conexión creada con éxito")
+                    self.arduinoconex = [True, ser]  # Almacena el objeto serial
+                    print(self.arduinoconex)
+                    break  # Sal del bucle una vez que se encuentra la conexión
+                else:
+                    ser.close()
             except serial.SerialException:
                 print("No hay conexión en el puerto:", puerto)
 
@@ -120,8 +123,16 @@ class MenuPrincipal(CTk):
             messagebox.showerror("PytuinoArm | Error de Conexión","No se puede iniciar el trabajo sin seleccionar un modo de trabajo")
             return
         
-        if self.arduinoconex[0]:
+        if self.arduinoconex[0] is True:
             print("Estamos conectados")
+            if self.datosposicionamiento[0]=="Automatico":
+                print("Modo automatico")
+            elif self.datosposicionamiento[0]=="Manual":
+                from manualMode import manualMode
+                self.arduinoconex[1].write("ModoManual/0".encode())
+                print(self.arduinoconex[1].readline().decode('utf-8').strip())
+                modomanual= manualMode(self.arduinoconex[1])
+                modomanual.grab_set()
         else:
             messagebox.showerror("PytuinoArm | Error de Conexión","No se puede iniciar el trabajo sin tener la conexión con el Arduino")        
 mp = MenuPrincipal()
