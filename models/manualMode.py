@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from serial import Serial
 from pynput import keyboard
 import time
-class manualMode(CTkToplevel):
+class manualMode(CTk):
 
     Motor = 80
     Motor2 = 40
@@ -19,8 +19,11 @@ class manualMode(CTkToplevel):
                                    light_image=Image.open("img/pytuino_logo.png"),size=(240,80))
         CTkLabel(self, image=self.logoimagen,text="").pack(pady=1)
 
+        self.controlimagen = CTkImage(dark_image=Image.open("img/controles.png"),
+                                   light_image=Image.open("img/controles.png"),size=(400,250))
+
         Feedback_frame = CTkFrame(self, fg_color="#DAF7A6", width=220, height=280)
-        Feedback_frame.place(x=10, y=40)
+        Feedback_frame.place(x=30, y=40)
         CTkLabel(Feedback_frame, text="Posiciones Motores", font=("Arial", 16, 'bold'),
                   fg_color="transparent",text_color="black").place(x=30, y=15)
         CTkLabel(Feedback_frame, text="Motor1:", font=("Arial", 15, 'bold'), 
@@ -34,6 +37,10 @@ class manualMode(CTkToplevel):
                                  fg_color="transparent",text_color="black")
         self.valmotor2.place(x=60, y=130)
 
+        CTkLabel(self, text="¿Como usar la grua?", font=("Arial", 15, 'bold'),
+                  fg_color="transparent",text_color="white").place(x=540, y=50)
+        CTkLabel(self, image=self.controlimagen,text="").place(x=415, y=80)
+
 
         self.listener = keyboard.Listener(on_press=self.on_press)
         self.listener.start()
@@ -43,14 +50,14 @@ class manualMode(CTkToplevel):
             if key.char == 'a':
                 if self.Motor > 0:
                     self.Motor -= 20  # Movimiento rápido, ajustar valor según necesidad
-                print('Izquierda')
+                print('Derecha')
                 instruccion = "Motor1/" + str(self.Motor)
                 self.valmotor.configure(text=str(self.Motor)+"°")
                 self.conexArduino.write(instruccion.encode())
             elif key.char == 'd':
                 if self.Motor != 180:
                     self.Motor += 20  # Movimiento rápido, ajustar valor según necesidad
-                print('Derecha')
+                print('Izquierda')
                 instruccion = "Motor1/" + str(self.Motor)
                 self.valmotor.configure(text=str(self.Motor)+"°")
                 self.conexArduino.write(instruccion.encode())
@@ -69,7 +76,6 @@ class manualMode(CTkToplevel):
                 self.valmotor2.configure(text=str(self.Motor2)+"°")
                 self.conexArduino.write(instruccion.encode())
             elif key.char == 'q':
-
                 print('CerrarPinza')
                 instruccion = "Cerrarpinza/1"
                 self.conexArduino.write(instruccion.encode())
@@ -81,7 +87,6 @@ class manualMode(CTkToplevel):
             if key == keyboard.Key.esc:
                 self.destroy()
                 return False
-        print(self.conexArduino.readline().decode('utf-8').strip())
 
 # arduino = Serial("COM4",9600,timeout=2)
 # time.sleep(2)

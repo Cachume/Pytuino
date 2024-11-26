@@ -8,6 +8,8 @@ import time
 class MenuPrincipal(CTk):
 
     datosposicionamiento = None
+    trabajo = False
+    posiciones=["Inicial","Recogida","Elevación","Desplazamiento","Soltado","Retorno"]
     def __init__(self):
         super().__init__()
         self.title("Menu Principal | Pyduino")
@@ -27,7 +29,7 @@ class MenuPrincipal(CTk):
         CTkLabel(Feedback_frame, text="Monitoreo", font=("Arial", 13, 'bold'), fg_color="transparent",text_color="black").place(x=20, y=15)
         CTkLabel(Feedback_frame, text="Estado:", font=("Arial", 14), fg_color="transparent",text_color="black").place(x=20, y=60)
         CTkLabel(Feedback_frame, text="Posición:", font=("Arial", 14), fg_color="transparent",text_color="black").place(x=20, y=80)
-        CTkLabel(Feedback_frame, text="Tiempo de operacion:", font=("Arial", 14), fg_color="transparent",text_color="black").place(x=20, y=100)
+        self.dis = CTkLabel(Feedback_frame, text="Distancia: 0cm", font=("Arial", 14), fg_color="transparent",text_color="black")
         #Valores Interfaces
         self.val_estado = CTkLabel(Feedback_frame, text="Detenido", font=("Arial", 14,'bold'), fg_color="transparent",text_color="red")
         self.val_estado.place(x=70, y=60)
@@ -91,6 +93,8 @@ class MenuPrincipal(CTk):
             imgmat = CTkImage(dark_image=Image.open("img/caja.png"),
                                    light_image=Image.open("img/caja.png"),size=(95,90))
             self.mateimage.configure(image=imgmat)
+            self.comando = str(self.datosposicionamiento[2])
+            print(self.comando)
         elif self.datosposicionamiento[0]=="Manual":
             self.matetext.configure(text="Sin seleccionar")
             self.matetext.place(x=50, y=150)
@@ -109,7 +113,7 @@ class MenuPrincipal(CTk):
                 response = ser.readline().decode('utf-8').strip()
                 print(response)
                 if response == "PytuinoArmConexion":
-                    messagebox.showinfo("PytuinoArm", "Conexión creada con éxito")
+                    #messagebox.showinfo("PytuinoArm", "Conexión creada con éxito")
                     self.arduinoconex = [True, ser]  # Almacena el objeto serial
                     print(self.arduinoconex)
                     break  # Sal del bucle una vez que se encuentra la conexión
@@ -125,15 +129,47 @@ class MenuPrincipal(CTk):
         
         if self.arduinoconex[0] is True:
             print("Estamos conectados")
-            if self.datosposicionamiento[0]=="Automatico":
-                print("Modo automatico")
-            elif self.datosposicionamiento[0]=="Manual":
-                from manualMode import manualMode
-                self.arduinoconex[1].write("ModoManual/0".encode())
-                print(self.arduinoconex[1].readline().decode('utf-8').strip())
-                modomanual= manualMode(self.arduinoconex[1])
-                modomanual.grab_set()
+            if self.trabajo is False :
+                self.trabajo= True
+                self.boton.configure(text="Detener Trabajo",fg_color="red" ,text_color="white")
+                if self.datosposicionamiento[0]=="Automatico":
+                    print("Modo automatico")
+                    instruccion = "Automatico/"+self.comando
+                    print(instruccion)
+                    self.arduinoconex[1].write(instruccion.encode())
+                    self.val_estado.configure(text="Funcionando",text_color="blue")
+                    self.dis.place(x=20, y=100)
+                    self.armInterface()
+                elif self.datosposicionamiento[0]=="Manual":
+                    from manualMode import manualMode
+                    self.arduinoconex[1].write("ModoManual/0".encode())
+                    print(self.arduinoconex[1].readline().decode('utf-8').strip())
+                    modomanual= manualMode(self.arduinoconex[1])
+                    modomanual.grab_set()
+                    modomanual.wait_window()
+                    self.arduinoconex[1].write("Salir/0".encode())
+            else:
+                self.trabajo= False
+                instruccion = "Salir"
+                print(instruccion)
+                self.arduinoconex[1].write(instruccion.encode())
+                self.boton.configure(text="Iniciar Trabajo",fg_color="green" ,text_color="white")
         else:
             messagebox.showerror("PytuinoArm | Error de Conexión","No se puede iniciar el trabajo sin tener la conexión con el Arduino")        
+
+    def armInterface(self):
+        if self.trabajo:
+            try:
+                InData = self.arduinoconex[1].readline().decode('utf-8').strip()           
+                if InData in self.posiciones:
+                    self.val_posicion.configure(text=InData,text_color="DarkGreen")
+                elif InData.split(":")[0]=="Distancia":
+                    self.dis.configure(text=InData)
+            except Exception as e:
+                print(f"Error {e}")
+
+            print(InData);
+            self.after(1000,self.armInterface)
+
 mp = MenuPrincipal()
 mp.mainloop()

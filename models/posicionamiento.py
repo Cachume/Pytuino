@@ -73,7 +73,12 @@ class Posicionamiento(Toplevel):
             self.destroy()
 
     def seleccionar_material(self, material):
-        self.principal.datosposicionamiento=["Automatico",material]
+        objetos_diccionario = {
+            "Caja Grande": "cajag",
+            "Caja Mediana": "cajam",
+            "Caja Pequeña": "cajap"
+        }
+        self.principal.datosposicionamiento=["Automatico",material,objetos_diccionario[material]]
         print(material)
         self.destroy()
 
