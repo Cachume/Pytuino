@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 from serial import Serial
 from pynput import keyboard
 import time
-class manualMode(CTk):
+class manualMode(CTkToplevel):
 
     Motor = 80
     Motor2 = 40

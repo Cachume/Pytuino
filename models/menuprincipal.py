@@ -148,6 +148,7 @@ class MenuPrincipal(CTk):
                     modomanual.grab_set()
                     modomanual.wait_window()
                     self.arduinoconex[1].write("Salir/0".encode())
+                    self.initWork()
             else:
                 self.trabajo= False
                 instruccion = "Salir"
